@@ -4,7 +4,7 @@ ANDROID APP that can recognize words of LIVE AUDIO/VIDEO STREAMING (powered by V
 This app has PROS & CONS compared to another Speech Recognition Framework like Free Android Google Speech Recognition, IBM WATSON, and PREMIUM GOOGPLE SPEECH API
 
 PROS:
-It's FREE, FULL DUPLEX (CAN DIRECTLY LISTEN TO ANY PLAYERS!) and quietly good enough accuracy
+It's FREE, FULL DUPLEX (CAN DIRECTLY LISTEN TO ANY PLAYERS!) and has a quietly good enough accuracy
 
 CONS:
 It's currently only support 20 languages and NEED BIG STORAGE to store that all LANGUAGE MODELS
