@@ -50,7 +50,6 @@ public class create_overlay_mic_button extends Service{
     public void onDestroy() {
         super.onDestroy();
         if (mGlobalOverlay_mic_button != null) {
-            //OVERLAYING_STATUS.OVERLAYING = false;
             mGlobalOverlay_mic_button.removeOverlayView(mic_button);
         }
         if (IS_OVER_REMOVEVIEW.IS_OVER) {
