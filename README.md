@@ -4,7 +4,7 @@ ANDROID APP that can RECOGNIZE words (using Android Developers built in Speech R
 This app has PROS & CONS compared to another Speech Recognition Framework like those free Android Developer Speech Recognition, IBM WATSON, and PREMIUM GOOGPLE SPEECH API
 
 PROS:
-It's FREE, FULL DUPLEX (CAN DIRECTLY LISTEN TO ANY PLAYERS!) and has a quietly good enough accuracy
+It's FREE, FULL DUPLEX (CAN DIRECTLY LISTEN TO ANY AUDIO/VIDEO MEDIA PLAYERS inlcuding WEB BROWSERS!) and has a quietly good enough accuracy
 
 CONS:
 It's currently only support 20 languages and NEED BIG STORAGE to store that all LANGUAGE MODELS
