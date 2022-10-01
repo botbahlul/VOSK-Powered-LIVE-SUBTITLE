@@ -10,10 +10,9 @@ CONS:
 It's currently only support 20 languages and NEED BIG STORAGE to store that all LANGUAGE MODELS
 
 NOTES:
-This repo doesn't support big files upload, so I can only upload English model
+Gitgub doesn't support big files upload, so I can only upload English model to this source repo, but you can try compiled apk in Realese page (about 1.4GB size!)
 
-To use another language models please download those SMALL MODELS from VOSK website https://alphacephei.com/vosk/models
-then extract them into models/src/main/assets folders with FOLDERS NAME in ISO CODES like en-US, ca-ES, de-DE, etc, just as they writen in models/build.gradle.
+To use another language models in this source please download those SMALL MODELS from VOSK website https://alphacephei.com/vosk/models then extract them into models/src/main/assets folders with FOLDERS NAME in ISO CODES like en-US, ca-ES, de-DE, etc, just as they writen in models/build.gradle.
 
 ```
 apply plugin: 'com.android.library'
