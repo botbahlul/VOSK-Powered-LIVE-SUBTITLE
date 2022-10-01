@@ -105,4 +105,9 @@ public class create_overlay_translation_text extends Service {
                     }
                 });
     }
+
+    private void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
 }
