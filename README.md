@@ -1,5 +1,5 @@
 # VOSK-Powered-LIVE-SUBTITLE
-ANDROID APP that can RECOGNIZE words of ANY LIVE AUDIO/VIDEO STREAMING (powered by VOSK Speech Recognition Framework) then TRANSLATE (powered by ANDROID MLKIT TRANSLATE) and display them as SUBTITLES
+ANDROID APP that can RECOGNIZE words of ANY LIVE AUDIO/VIDEO STREAMING (powered by VOSK Speech Recognition API) then TRANSLATE (powered by ANDROID MLKIT TRANSLATE) and display them as SUBTITLES
 
 
 https://user-images.githubusercontent.com/88623122/193421588-a7a6cf3d-c241-44fe-b29b-2bac910dd1e2.mp4
