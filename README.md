@@ -15,6 +15,7 @@ This repo doesn't support big files upload, so I can only upload English model
 To use another language models please download those SMALL MODELS from VOSK website https://alphacephei.com/vosk/models
 then extract them into models/src/main/assets folders with FOLDERS NAME in ISO CODES like en-US, ca-ES, de-DE, etc, just as they writen in models/build.gradle.
 
+```
 apply plugin: 'com.android.library'
 
 android {
@@ -209,6 +210,7 @@ tasks.register('genUUID') {
 }
 
 preBuild.dependsOn(genUUID)
+```
 
 ![image](https://user-images.githubusercontent.com/88623122/193415122-a183547c-0c78-4be0-9ce0-18b8d11fa548.png)
 
