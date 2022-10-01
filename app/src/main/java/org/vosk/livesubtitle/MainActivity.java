@@ -143,7 +143,6 @@ public class MainActivity extends BaseActivity {
         arraylist_models.add("cs-CZ");
         arraylist_models.add("pl-PL");
 
-        // Setup layout
         arraylist_src.add("en");
         arraylist_src.add("zh");
         arraylist_src.add("ru");
@@ -333,9 +332,6 @@ public class MainActivity extends BaseActivity {
         textview_debug2 = findViewById(R.id.textview_debug2);
         voice_text = findViewById(R.id.voice_text);
 
-        //setVolumeControlStream(AudioManager.MODE_IN_COMMUNICATION);
-        //AudioManager am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        //am.setSpeakerphoneOn(true);
         audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mStreamVolume = audio.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
 
@@ -363,12 +359,6 @@ public class MainActivity extends BaseActivity {
         }
 
         checkRecordAudioPermission();
-
-        // Check if user has given permission to record audio, init the model after permission is granted
-        /*int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
-        }*/
 
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (!notificationManager.isNotificationPolicyAccessGranted()) {
@@ -544,28 +534,19 @@ public class MainActivity extends BaseActivity {
     }
 
     private void check_dictionary() {
-        //File edir = Environment.getExternalStorageDirectory();
-        //File idir = Environment.getDataDirectory();
-        //String string_edir = edir.toString();
-        //String string_idir = idir.toString();
-        //String PACKAGE_NAME = getApplicationContext().getPackageName().toString();
-        //String PACKAGE_FOLDER = "/data/data/" + PACKAGE_NAME;
-
-        //String string1 = "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE_PREFS.SRC + "_" + LANGUAGE_PREFS.DST;
-        //String string2 = "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE_PREFS.DST + "_" + LANGUAGE_PREFS.SRC;
         String string1 = "/no_backup/com.google.mlkit.translate.models/" + textview_src.getText() + "_" + textview_dst.getText();
         String string2 = "/no_backup/com.google.mlkit.translate.models/" + textview_dst.getText() + "_" + textview_src.getText();
-        File mydir1 = new File(Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + string1);
-        File mydir2 = new File(Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + string2);
+        File mdir1 = new File(Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + string1);
+        File mdir2 = new File(Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + string2);
         String downloaded_status_message;
-        if (mydir1.exists() || mydir2.exists()) {
+        if (mdir1.exists() || mdir2.exists()) {
             DICTIONARY_MODEL_DOWNLOAD_STATUS.DOWNLOADED = true;
             downloaded_status_message = "Dictionary is ready to use";
             textview_debug2.setText(downloaded_status_message);
         }
 
-        if (!(mydir1.exists())) {
-            if (!(mydir2.exists())) {
+        if (!(mdir1.exists())) {
+            if (!(mdir2.exists())) {
                 DICTIONARY_MODEL_DOWNLOAD_STATUS.DOWNLOADED = false;
                 downloaded_status_message = "Preparing dictionary, please be patient";
                 textview_debug2.setText(downloaded_status_message);
