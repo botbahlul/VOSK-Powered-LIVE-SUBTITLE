@@ -7,7 +7,7 @@ PROS:
 It's FREE, FULL DUPLEX (CAN DIRECTLY LISTEN TO ANY AUDIO/VIDEO MEDIA PLAYERS inlcuding WEB BROWSERS!) and has a quietly good enough accuracy
 
 CONS:
-It's currently only support 20 languages and NEED BIG STORAGE to store that all LANGUAGE MODELS
+It's currently only support 20 languages and NEED BIG STORAGE to store those all LANGUAGE MODELS
 
 NOTES:
 Gitgub doesn't support big files upload, so I can only upload English model to this source repo, but you can try compiled apk in Realese page (about 1.4GB size!)
