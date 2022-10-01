@@ -1,0 +1,7 @@
+Czech model for Android from Rhasspy project
+
+https://github.com/rhasspy/cs_kaldi-rhasspy
+
+MIT License
+
+%WER 21.29 [ 10747 / 50484, 2872 ins, 592 del, 7283 sub ] exp/tdnn/decode_test_cv/wer_10_1.0
