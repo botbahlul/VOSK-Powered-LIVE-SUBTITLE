@@ -34,7 +34,6 @@ import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends BaseActivity {
 
-    /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static AudioManager audio;
     public static int mStreamVolume;
@@ -344,9 +343,6 @@ public class MainActivity extends BaseActivity {
         textview_debug2 = findViewById(R.id.textview_debug2);
         voice_text = findViewById(R.id.voice_text);
 
-        //setVolumeControlStream(AudioManager.MODE_IN_COMMUNICATION);
-        //AudioManager am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        //am.setSpeakerphoneOn(true);
         audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mStreamVolume = audio.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
 
@@ -376,12 +372,6 @@ public class MainActivity extends BaseActivity {
         }
 
         checkRecordAudioPermission();
-
-        // Check if user has given permission to record audio, init the model after permission is granted
-        /*int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
-        }*/
 
         NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (!notificationManager.isNotificationPolicyAccessGranted()) {
@@ -537,16 +527,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    /*private void checkStoragePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
-    }*/
-
     private void start_create_overlay_mic_button() {
         Intent i = new Intent(this, create_overlay_mic_button.class);
         startService(i);
@@ -575,16 +555,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void check_mlkit_dictionary() {
-        //File edir = Environment.getExternalStorageDirectory();
-        //File idir = Environment.getDataDirectory();
-        //String string_edir = edir.toString();
-        //String string_idir = idir.toString();
-        //String PACKAGE_NAME = getApplicationContext().getPackageName().toString();
-        //String PACKAGE_FOLDER = "/data/data/" + PACKAGE_NAME;
-
-        //String string1 = "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.SRC + "_" + LANGUAGE.DST;
-        //String string2 = "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.DST + "_" + LANGUAGE.SRC;
-
         if (Objects.equals(textview_src.getText(), textview_dst.getText())) {
             MLKIT_DICTIONARY.READY = true;
             mlkit_status_message = "";
