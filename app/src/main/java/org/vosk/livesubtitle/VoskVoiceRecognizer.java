@@ -25,14 +25,7 @@ import org.vosk.android.SpeechService;
 import org.vosk.android.SpeechStreamService;
 import org.vosk.android.StorageService;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -57,21 +50,13 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
     private SpeechStreamService speechStreamService;
     private Translator translator;
     private String results;
-    private String mlkit_status_message;
+    private String downloaded_status_message;
 
     @Override
     public void onCreate() {
         super.onCreate();
         LibVosk.setLogLevel(LogLevel.INFO);
-
-        if (Objects.equals(VOSK_MODEL.ISO_CODE, "en-US")) {
-            initModel(VOSK_MODEL.ISO_CODE);
-        } else {
-            initDownloadedModel(VOSK_MODEL.ISO_CODE);
-        }
-
-        //initDownloadedModel(VOSK_MODEL.ISO_CODE);
-
+        initModel(LANGUAGE.MODEL);
         if (RECOGNIZING_STATUS.RECOGNIZING) {
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -83,7 +68,7 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
                 }
             },0,2000);
             if (VOICE_TEXT.STRING.length() > 0) {
-                MainActivity.textview_debug2.setText(mlkit_status_message);
+                MainActivity.textview_debug2.setText(downloaded_status_message);
             }
         } else {
             if (translator != null) translator.close();
@@ -91,27 +76,14 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
     }
 
     private void initModel(String string_model) {
-        StorageService.unpack(this, string_model, "model", (model) -> {
+        StorageService.unpack(this, string_model, "model",
+                (model) -> {
                     this.model = model;
                     setUiState(STATE_READY);
                     recognizeMicrophone();
                 },
                 (exception) -> setErrorState("Failed to unpack the model" + exception.getMessage()));
     }
-
-    private void initDownloadedModel(String string_model) {
-        if (VOSK_MODEL.DOWNLOADED) {
-            model = new Model(VOSK_MODEL.USED_PATH);
-            setUiState(STATE_READY);
-            recognizeMicrophone();
-        } else {
-            create_overlay_mic_button.mic_button.setImageResource(R.drawable.ic_mic_black_off);
-            RECOGNIZING_STATUS.RECOGNIZING = false;
-            stopSelf();
-            toast("You need to download model first");
-        }
-    }
-
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -252,6 +224,7 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
     }
 
     private void setErrorState(String message) {
+
         MainActivity.textview_debug.setText(message);
         speechService.startListening(this);
     }
@@ -289,8 +262,6 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
         translator = Translation.getClient(options);
 
         if (!MLKIT_DICTIONARY.READY) {
-            String msg = "Downloading dictionary, please be patient";
-            toast(msg);
             DownloadConditions conditions = new DownloadConditions.Builder().build();
             translator.downloadModelIfNeeded(conditions)
                     .addOnSuccessListener(unused -> MLKIT_DICTIONARY.READY = true)
@@ -298,8 +269,8 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
         }
 
         if (MLKIT_DICTIONARY.READY) {
-            mlkit_status_message = "Dictionary is ready";
-            MainActivity.textview_debug2.setText(mlkit_status_message);
+            downloaded_status_message = "Dictionary is ready to use";
+            MainActivity.textview_debug2.setText(downloaded_status_message);
             translator.translate(text).addOnSuccessListener(s -> {
                 TRANSLATION_TEXT.STRING = s;
                 if (RECOGNIZING_STATUS.RECOGNIZING) {
@@ -322,85 +293,6 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
 
     private void toast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void copyFile(String inputPath, String inputFile, String outputPath) {
-        InputStream in;
-        OutputStream out;
-
-        try {
-            File dir = new File (outputPath);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            in = new FileInputStream(inputPath + inputFile);
-            out = new FileOutputStream(outputPath + inputFile);
-
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            in.close();
-            in = null;
-
-            // write the output file (You have now copied the file)
-            out.flush();
-            out.close();
-            out = null;
-
-        }  catch (FileNotFoundException fnfe1) {
-            //Log.e("tag", fnfe1.getMessage());
-        }
-        catch (Exception e) {
-            //Log.e("tag", e.getMessage());
-        }
-
-    }
-
-    public static void copyFolder(File source, File destination) {
-        if (source.isDirectory()) {
-            if (!destination.exists()) {
-                destination.mkdirs();
-            }
-            String[] files = source.list();
-            if (files != null) {
-                for (String file : files) {
-                    File srcFile = new File(source, file);
-                    File destFile = new File(destination, file);
-                    copyFolder(srcFile, destFile);
-                }
-            }
-        } else {
-            InputStream in = null;
-            OutputStream out = null;
-            try {
-                in = new FileInputStream(source);
-                out = new FileOutputStream(destination);
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, length);
-                }
-            } catch (Exception e) {
-                try {
-                    if (in != null) {
-                        in.close();
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
     }
 
 }

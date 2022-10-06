@@ -30,6 +30,8 @@ public class GlobalOverlay {
     private WindowManager.LayoutParams mOverlayLayoutParams;
     public static int DisplayWidth;
     public static int DisplayHeight;
+    //public static int X;
+    //public static int Y;
 
     private final DisplayMetrics display = new DisplayMetrics();
 
@@ -83,6 +85,7 @@ public class GlobalOverlay {
 
         DisplayWidth = display.widthPixels;
         DisplayHeight = display.heightPixels;
+        //float d = display.density;
 
         mOverlayView = view;
         mOnClickListener = onClickListener;
@@ -95,6 +98,26 @@ public class GlobalOverlay {
         View.OnTouchListener mOnTouchListener = newSimpleOnTouchListener();
         mWindowManager.addView(mOverlayView, mOverlayLayoutParams);
         mOverlayView.setOnTouchListener(mOnTouchListener);
+        // DEBUG
+        /*MainActivity.textview_debug.setText(
+                "DisplayWidth="+
+                DisplayWidth+
+                System.getProperty("line.separator")+
+                "DisplayHeight"+
+                DisplayHeight+
+                System.getProperty("line.separator")+
+                "mOverlayLayoutParams.width="+
+                mOverlayLayoutParams.width+
+                System.getProperty("line.separator")+
+                "mOverlayLayoutParams.height="+
+                mOverlayLayoutParams.height+
+                System.getProperty("line.separator")+
+                "mOverlayLayoutParams.x="+
+                mOverlayLayoutParams.x+
+                System.getProperty("line.separator")+
+                "mOverlayLayoutParams.y="+
+                mOverlayLayoutParams.y);*/
+
     }
 
     /** Manually remove an overlay without destroying the service. */
