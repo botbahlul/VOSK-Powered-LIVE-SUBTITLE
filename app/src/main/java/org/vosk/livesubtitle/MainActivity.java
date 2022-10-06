@@ -1,5 +1,7 @@
 package org.vosk.livesubtitle;
 
+import static android.text.TextUtils.substring;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
@@ -10,6 +12,8 @@ import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,14 +22,24 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -33,11 +47,11 @@ import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends BaseActivity {
 
-    /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static AudioManager audio;
     public static int mStreamVolume;
     private final ArrayList<String> arraylist_models = new ArrayList<>();
+    private final ArrayList<String> arraylist_models_URL = new ArrayList<>();
     private final ArrayList<String> arraylist_src = new ArrayList<>();
     private final ArrayList<String> arraylist_dst = new ArrayList<>();
     private final ArrayList<String> arraylist_src_languages = new ArrayList<>();
@@ -45,7 +59,17 @@ public class MainActivity extends BaseActivity {
     private final Map<String, String> map_model_country = new HashMap<>();
     private final Map<String, String> map_src_country = new HashMap<>();
     private final Map<String, String> map_dst_country = new HashMap<>();
+    private final Map<String, String> map_country_models_URL = new HashMap<>();
     private Spinner spinner_src_languages;
+    private Button button_delete_model;
+    private Button button_download_model;
+    private ProgressBar mProgressBar;
+    private TextView textview_modelURL;
+    private TextView textview_model_zip_file;
+    private TextView textview_filesize;
+    private TextView textview_bytesdownloaded;
+    private TextView textview_downloaded_status;
+    private TextView textview_extracted_folder;
     private TextView textview_src;
     private Spinner spinner_dst_languages;
     private TextView textview_dst;
@@ -60,6 +84,17 @@ public class MainActivity extends BaseActivity {
     @SuppressLint("StaticFieldLeak")
     public static EditText voice_text;
     private DisplayMetrics display;
+    private Button button_toggle_overlay;
+
+    private String string_en_src_folder;
+    private String string_en_dst_folder;
+    private String string_src_en_folder;
+    private String string_dst_en_folder;
+    private File file_en_src_folder;
+    private File file_en_dst_folder;
+    private File file_src_en_folder;
+    private File file_dst_en_folder;
+    private String mlkit_status_message = "";
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
@@ -77,7 +112,7 @@ public class MainActivity extends BaseActivity {
                 start_create_overlay_mic_button();
                 stop_create_overlay_translation_text();
                 start_create_overlay_translation_text();
-                if (TRANSLATION_TEXT.STRING.length()>0) {
+                if (TRANSLATION_TEXT.STRING.length() > 0) {
                     create_overlay_translation_text.overlay_translation_text.setText(TRANSLATION_TEXT.STRING);
                 }
             }
@@ -87,8 +122,7 @@ public class MainActivity extends BaseActivity {
             }
             String string_recognizing = "Recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
             textview_recognizing.setText(string_recognizing);
-        }
-        else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             getWindowManager().getDefaultDisplay().getMetrics(display);
             float d = display.density;
             DISPLAY_METRIC.DISPLAY_WIDTH = display.widthPixels;
@@ -101,7 +135,7 @@ public class MainActivity extends BaseActivity {
                 start_create_overlay_mic_button();
                 stop_create_overlay_translation_text();
                 start_create_overlay_translation_text();
-                if (TRANSLATION_TEXT.STRING.length()>0) {
+                if (TRANSLATION_TEXT.STRING.length() > 0) {
                     create_overlay_translation_text.overlay_translation_text.setText(TRANSLATION_TEXT.STRING);
                 }
             }
@@ -187,12 +221,38 @@ public class MainActivity extends BaseActivity {
         arraylist_src_languages.add("Czech");
         arraylist_src_languages.add("Polish");
 
-        for (int i=0;i<arraylist_src_languages.size();i++) {
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-cn-0.22.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-fr-0.22.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-de-0.15.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-pt-0.3.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-vn-0.3.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-it-0.22.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-nl-0.22.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-ca-0.4.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-fa-0.5.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-uk-v3-small.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-kz-0.15.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-sv-rhasspy-0.15.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-ja-0.22.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-eo-0.42.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-hi-0.22.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-cs-0.4-rhasspy.zip");
+        arraylist_models_URL.add("https://alphacephei.com/vosk/models/vosk-model-small-pl-0.22.zip");
+
+        for (int i = 0; i < arraylist_src_languages.size(); i++) {
             map_model_country.put(arraylist_src_languages.get(i), arraylist_models.get(i));
         }
 
-        for (int i=0;i<arraylist_src_languages.size();i++) {
+        for (int i = 0; i < arraylist_src_languages.size(); i++) {
             map_src_country.put(arraylist_src_languages.get(i), arraylist_src.get(i));
+        }
+
+        for (int i = 0; i < arraylist_src_languages.size(); i++) {
+            map_country_models_URL.put(arraylist_src_languages.get(i), arraylist_models_URL.get(i));
         }
 
         arraylist_dst.add("af");
@@ -315,19 +375,28 @@ public class MainActivity extends BaseActivity {
         arraylist_dst_languages.add("Vietnamese");
         arraylist_dst_languages.add("Chinese");
 
-        for (int i=0;i<arraylist_dst_languages.size();i++) {
+        for (int i = 0; i < arraylist_dst_languages.size(); i++) {
             map_dst_country.put(arraylist_dst_languages.get(i), arraylist_dst.get(i));
         }
 
         spinner_src_languages = findViewById(R.id.spinner_src_languages);
         setup_src_spinner(arraylist_src_languages);
+        button_delete_model = findViewById(R.id.button_delete_model);
+        button_download_model = findViewById(R.id.button_download_model);
+        mProgressBar = findViewById(R.id.mProgressBar);
+        textview_modelURL = findViewById(R.id.textview_modelURL);
+        textview_model_zip_file = findViewById(R.id.textview_model_zip_file);
+        textview_filesize = findViewById(R.id.textview_filesize);
+        textview_bytesdownloaded = findViewById(R.id.textview_bytesdownloaded);
+        textview_downloaded_status = findViewById(R.id.textview_downloaded_status);
+        textview_extracted_folder = findViewById(R.id.textview_extracted_folder);
         textview_src = findViewById(R.id.textview_src);
         spinner_dst_languages = findViewById(R.id.spinner_dst_languages);
         setup_dst_spinner(arraylist_dst_languages);
         textview_dst = findViewById(R.id.textview_dst);
         textview_recognizing = findViewById(R.id.textview_recognizing);
         textview_overlaying = findViewById(R.id.textview_overlaying);
-        Button button_toggle_overlay = findViewById(R.id.button_toggle_overlay);
+        button_toggle_overlay = findViewById(R.id.button_toggle_overlay);
         textview_debug = findViewById(R.id.textview_debug);
         textview_debug2 = findViewById(R.id.textview_debug2);
         voice_text = findViewById(R.id.voice_text);
@@ -353,6 +422,9 @@ public class MainActivity extends BaseActivity {
         String string_overlaying = "Overlaying=" + OVERLAYING_STATUS.OVERLAYING;
         textview_overlaying.setText(string_overlaying);
 
+        VOSK_MODEL.DOWNLOADED = false;
+        MLKIT_DICTIONARY.READY = false;
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             getSupportActionBar().setCustomView(R.layout.actionbar_layout);
@@ -370,26 +442,63 @@ public class MainActivity extends BaseActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 stop_vosk_voice_recognizer();
                 if (RECOGNIZING_STATUS.RECOGNIZING) start_vosk_voice_recognizer();
+
                 stop_create_overlay_translation_text();
                 if (OVERLAYING_STATUS.OVERLAYING) start_create_overlay_translation_text();
+
                 String src_country = spinner_src_languages.getSelectedItem().toString();
-                LANGUAGE_PREFS.MODEL = map_model_country.get(src_country);
-                LANGUAGE_PREFS.SRC = map_src_country.get(src_country);
-                textview_src.setText(LANGUAGE_PREFS.SRC);
+                LANGUAGE.SRC = map_src_country.get(src_country);
+                textview_src.setText(LANGUAGE.SRC);
+
                 String dst_country = spinner_dst_languages.getSelectedItem().toString();
-                LANGUAGE_PREFS.DST = map_dst_country.get(dst_country);
-                textview_dst.setText(LANGUAGE_PREFS.DST);
-                check_dictionary();
+                LANGUAGE.DST = map_dst_country.get(dst_country);
+                textview_dst.setText(LANGUAGE.DST);
+
+                VOSK_MODEL.ISO_CODE = map_model_country.get(src_country);
+                VOSK_MODEL.URL_ADDRESS = map_country_models_URL.get(src_country);
+                if (VOSK_MODEL.URL_ADDRESS != null) {
+                    VOSK_MODEL.ZIP_FILENAME = substring(VOSK_MODEL.URL_ADDRESS, VOSK_MODEL.URL_ADDRESS.lastIndexOf('/') + 1, VOSK_MODEL.URL_ADDRESS.length());
+                }
+                VOSK_MODEL.ZIP_FILE_COMPLETE_PATH = getExternalFilesDir(null).getAbsolutePath() + "/" + VOSK_MODEL.ZIP_FILENAME;
+                VOSK_MODEL.EXTRACTED_PATH = getExternalFilesDir(null).getAbsolutePath() + "/" + "downloaded";
+                String string_url = "Model URL = " + VOSK_MODEL.URL_ADDRESS;
+                textview_modelURL.setText(string_url);
+                String string_zip_path = "Save as = " + VOSK_MODEL.ZIP_FILE_COMPLETE_PATH;
+                textview_model_zip_file.setText(string_zip_path);
+                check_vosk_downloaded_model(VOSK_MODEL.ISO_CODE);
+
+                string_en_src_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + textview_src.getText();
+                string_en_dst_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + textview_dst.getText();
+                string_src_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + textview_src.getText() + "_" + "en" ;
+                string_dst_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + textview_dst.getText() + "_" + "en" ;
+                file_en_src_folder = new File(string_en_src_folder);
+                file_en_dst_folder = new File(string_en_dst_folder);
+                file_src_en_folder = new File(string_src_en_folder);
+                file_dst_en_folder = new File(string_dst_en_folder);
+                check_mlkit_dictionary();
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {
                 String src_country = spinner_src_languages.getSelectedItem().toString();
-                LANGUAGE_PREFS.MODEL = map_model_country.get(src_country);
-                LANGUAGE_PREFS.SRC = map_src_country.get(src_country);
-                textview_src.setText(LANGUAGE_PREFS.SRC);
+                LANGUAGE.SRC = map_src_country.get(src_country);
+                textview_src.setText(LANGUAGE.SRC);
+
                 String dst_country = spinner_dst_languages.getSelectedItem().toString();
-                LANGUAGE_PREFS.DST = map_dst_country.get(dst_country);
-                textview_dst.setText(LANGUAGE_PREFS.DST);
+                LANGUAGE.DST = map_dst_country.get(dst_country);
+                textview_dst.setText(LANGUAGE.DST);
+
+                VOSK_MODEL.ISO_CODE = map_model_country.get(src_country);
+                VOSK_MODEL.URL_ADDRESS = map_country_models_URL.get(src_country);
+                if (VOSK_MODEL.URL_ADDRESS != null) {
+                    VOSK_MODEL.ZIP_FILENAME = substring(VOSK_MODEL.URL_ADDRESS, VOSK_MODEL.URL_ADDRESS.lastIndexOf('/') + 1, VOSK_MODEL.URL_ADDRESS.length());
+                }
+                VOSK_MODEL.ZIP_FILE_COMPLETE_PATH = getExternalFilesDir(null).getAbsolutePath() + "/" + VOSK_MODEL.ZIP_FILENAME;
+                VOSK_MODEL.EXTRACTED_PATH = getExternalFilesDir(null).getAbsolutePath() + "/" + "downloaded";
+                String string_url = "Model URL = " + VOSK_MODEL.URL_ADDRESS;
+                textview_modelURL.setText(string_url);
+                String string_zip_path = "Save as = " + VOSK_MODEL.ZIP_FILE_COMPLETE_PATH;
+                textview_model_zip_file.setText(string_zip_path);
+                check_vosk_downloaded_model(VOSK_MODEL.ISO_CODE);
             }
         });
 
@@ -397,24 +506,75 @@ public class MainActivity extends BaseActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 stop_vosk_voice_recognizer();
                 if (RECOGNIZING_STATUS.RECOGNIZING) start_vosk_voice_recognizer();
+
                 stop_create_overlay_translation_text();
                 if (OVERLAYING_STATUS.OVERLAYING) start_create_overlay_translation_text();
+
                 String src_country = spinner_src_languages.getSelectedItem().toString();
-                LANGUAGE_PREFS.SRC = map_src_country.get(src_country);
-                textview_src.setText(LANGUAGE_PREFS.SRC);
+                LANGUAGE.SRC = map_src_country.get(src_country);
+                textview_src.setText(LANGUAGE.SRC);
                 String dst_country = spinner_dst_languages.getSelectedItem().toString();
-                LANGUAGE_PREFS.DST = map_dst_country.get(dst_country);
-                textview_dst.setText(LANGUAGE_PREFS.DST);
-                check_dictionary();
+                LANGUAGE.DST = map_dst_country.get(dst_country);
+                textview_dst.setText(LANGUAGE.DST);
+
+                string_en_src_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + textview_src.getText();
+                string_en_dst_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + textview_dst.getText();
+                string_src_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + textview_src.getText() + "_" + "en" ;
+                string_dst_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + textview_dst.getText() + "_" + "en" ;
+                file_en_src_folder = new File(string_en_src_folder);
+                file_en_dst_folder = new File(string_en_dst_folder);
+                file_src_en_folder = new File(string_src_en_folder);
+                file_dst_en_folder = new File(string_dst_en_folder);
+                check_mlkit_dictionary();
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {
                 String src_country = spinner_src_languages.getSelectedItem().toString();
-                LANGUAGE_PREFS.SRC = map_src_country.get(src_country);
-                textview_src.setText(LANGUAGE_PREFS.SRC);
+                LANGUAGE.SRC = map_src_country.get(src_country);
+                textview_src.setText(LANGUAGE.SRC);
+
                 String dst_country = spinner_dst_languages.getSelectedItem().toString();
-                LANGUAGE_PREFS.DST = map_dst_country.get(dst_country);
-                textview_dst.setText(LANGUAGE_PREFS.DST);
+                LANGUAGE.DST = map_dst_country.get(dst_country);
+                textview_dst.setText(LANGUAGE.DST);
+            }
+        });
+
+        button_delete_model.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File ddir = new File(VOSK_MODEL.USED_PATH);
+                if (ddir.exists()) {
+                    deleteRecursively(ddir);
+                    String msg = ddir + "deleted";
+                    toast(msg);
+                }
+                check_vosk_downloaded_model(VOSK_MODEL.ISO_CODE);
+            }
+        });
+
+        button_download_model.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!VOSK_MODEL.DOWNLOADED) {
+                    File edir = new File(getApplicationContext().getExternalFilesDir(null), "downloaded");
+                    if (!(edir.exists())) {
+                        edir.mkdir();
+                    }
+
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    textview_filesize.setVisibility(View.VISIBLE);
+                    textview_bytesdownloaded.setVisibility(View.VISIBLE);
+
+                    new Thread(new Runnable() {
+                        public void run() {
+                            DownloadModel(VOSK_MODEL.URL_ADDRESS);
+                        }
+                    }).start();
+
+                } else {
+                    String msg = "Model has been downloaded, no need to download it again";
+                    toast(msg);
+                }
             }
         });
 
@@ -446,7 +606,6 @@ public class MainActivity extends BaseActivity {
                 return false;
             }
         });
-
     }
 
     @Override
@@ -467,8 +626,7 @@ public class MainActivity extends BaseActivity {
         stop_vosk_voice_recognizer();
     }
 
-    public void setup_src_spinner(ArrayList<String> supported_languages)
-    {
+    public void setup_src_spinner(ArrayList<String> supported_languages) {
         Collections.sort(supported_languages);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_textview_align, supported_languages);
         adapter.setDropDownViewResource(R.layout.spinner_textview_align);
@@ -476,8 +634,7 @@ public class MainActivity extends BaseActivity {
         spinner_src_languages.setSelection(supported_languages.indexOf("English"));
     }
 
-    public void setup_dst_spinner(ArrayList<String> supported_languages)
-    {
+    public void setup_dst_spinner(ArrayList<String> supported_languages) {
         Collections.sort(supported_languages);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_textview_align, supported_languages);
         adapter.setDropDownViewResource(R.layout.spinner_textview_align);
@@ -486,7 +643,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void checkRecordAudioPermission() {
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},1);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
     }
 
     private void checkDrawOverlayPermission() {
@@ -523,25 +680,190 @@ public class MainActivity extends BaseActivity {
         stopService(new Intent(this, VoskVoiceRecognizer.class));
     }
 
-    private void check_dictionary() {
-        String string1 = "/no_backup/com.google.mlkit.translate.models/" + textview_src.getText() + "_" + textview_dst.getText();
-        String string2 = "/no_backup/com.google.mlkit.translate.models/" + textview_dst.getText() + "_" + textview_src.getText();
-        File mdir1 = new File(Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + string1);
-        File mdir2 = new File(Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + string2);
-        String downloaded_status_message;
-        if (mdir1.exists() || mdir2.exists()) {
-            DICTIONARY_MODEL_DOWNLOAD_STATUS.DOWNLOADED = true;
-            downloaded_status_message = "Dictionary is ready to use";
-            textview_debug2.setText(downloaded_status_message);
+    private void check_mlkit_dictionary() {
+        if (Objects.equals(textview_src.getText(), textview_dst.getText())) {
+            MLKIT_DICTIONARY.READY = true;
+            mlkit_status_message = "";
+        }
+        if (Objects.equals(textview_src.getText(), "en")) {
+            if (file_en_dst_folder.exists() || file_dst_en_folder.exists()) {
+                MLKIT_DICTIONARY.READY = true;
+                mlkit_status_message = "Dictionary is ready";
+            } else {
+                MLKIT_DICTIONARY.READY = false;
+                mlkit_status_message = "Dictionary is not ready";
+            }
+        }
+        if (Objects.equals(textview_dst.getText(), "en")) {
+            if (file_en_src_folder.exists() || file_src_en_folder.exists()) {
+                MLKIT_DICTIONARY.READY = true;
+                mlkit_status_message = "Dictionary is ready";
+            } else {
+                MLKIT_DICTIONARY.READY = false;
+                mlkit_status_message = "Dictionary is not ready";
+            }
+        }
+        if (!(Objects.equals(textview_src.getText(), "en")) && !(Objects.equals(textview_dst.getText(), "en"))) {
+            if ((file_en_src_folder.exists() || file_src_en_folder.exists()) && (file_en_dst_folder.exists()) || file_dst_en_folder.exists()) {
+                MLKIT_DICTIONARY.READY = true;
+                mlkit_status_message = "Dictionary is ready";
+            }
+            else if ((file_en_src_folder.exists() || file_src_en_folder.exists()) && !file_dst_en_folder.exists() && !file_en_dst_folder.exists()) {
+                MLKIT_DICTIONARY.READY = false;
+                mlkit_status_message = "Dictionary is not ready";
+            }
+            else if ((file_en_dst_folder.exists() || file_dst_en_folder.exists()) && !file_src_en_folder.exists() && !file_en_src_folder.exists()) {
+                MLKIT_DICTIONARY.READY = false;
+                mlkit_status_message = "Dictionary is not ready";
+            }
+            else if (!file_en_src_folder.exists() && !file_en_dst_folder.exists() && !file_src_en_folder.exists() && !file_dst_en_folder.exists()) {
+                MLKIT_DICTIONARY.READY = false;
+                mlkit_status_message = "Dictionary is not ready";
+            }
+        }
+        textview_debug2.setText(mlkit_status_message);
+    }
+
+    public void DownloadModel (String models_URL) {
+        File dir = new File(String.valueOf(this.getExternalFilesDir(null)));
+        if(!(dir.exists())){
+            dir.mkdir();
         }
 
-        if (!(mdir1.exists())) {
-            if (!(mdir2.exists())) {
-                DICTIONARY_MODEL_DOWNLOAD_STATUS.DOWNLOADED = false;
-                downloaded_status_message = "Preparing dictionary, please be patient";
-                textview_debug2.setText(downloaded_status_message);
+        File edir = new File(this.getExternalFilesDir(null), "downloaded");
+        if(!(edir.exists())){
+            edir.mkdir();
+        }
+
+        ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        executor.execute(new Runnable() {
+            int count;
+
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(models_URL);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.connect();
+
+                    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                        String r ="Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage();
+                        textview_debug.setText(r);
+                    } else {
+                        String r = "Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage();
+                        textview_debug.setText(r);
+                        if (connection.getContentLength() > 0) {
+                            int lengthOfFile = connection.getContentLength();
+                            String string_filesize = "File size=" + lengthOfFile + " bytes";
+                            textview_filesize.setText(string_filesize);
+                            InputStream input = connection.getInputStream();
+                            OutputStream output = new FileOutputStream(VOSK_MODEL.ZIP_FILE_COMPLETE_PATH);
+
+                            byte[] data = new byte[1024];
+                            long total = 0;
+                            while ((count = input.read(data)) != -1) {
+                                total += count;
+                                String string_bytes_received = "Bytes received=" + total + " bytes";
+                                textview_bytesdownloaded.setText(string_bytes_received);
+                                mProgressBar.setIndeterminate(false);
+                                mProgressBar.setMax(100);
+                                if (lengthOfFile > 0) {
+                                    publishProgress((int) (total * 100 / lengthOfFile));
+                                }
+                                output.write(data, 0, count);
+                            }
+                            output.flush();
+                            output.close();
+                            input.close();
+                        }
+                    }
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //UI Thread work here
+                            mProgressBar.setVisibility(View.GONE);
+                            textview_filesize.setVisibility(View.GONE);
+                            textview_bytesdownloaded.setVisibility(View.GONE);
+                            VOSK_MODEL.DOWNLOADED = true;
+                            Decompress df = new Decompress(VOSK_MODEL.ZIP_FILE_COMPLETE_PATH, VOSK_MODEL.EXTRACTED_PATH);
+                            df.unzip();
+                            File oldfolder = new File(VOSK_MODEL.EXTRACTED_PATH, VOSK_MODEL.ZIP_FILENAME.replace(".zip", ""));
+                            File newfolder = new File(VOSK_MODEL.EXTRACTED_PATH, VOSK_MODEL.ISO_CODE);
+                            oldfolder.renameTo(newfolder);
+                            File ddir = new File(VOSK_MODEL.ZIP_FILE_COMPLETE_PATH);
+                            deleteRecursively(ddir);
+                            VOSK_MODEL.USED_PATH = VOSK_MODEL.EXTRACTED_PATH + "/" + VOSK_MODEL.ISO_CODE;
+                            String r = "";
+                            textview_debug.setText(r);
+                            check_vosk_downloaded_model(VOSK_MODEL.ISO_CODE);
+                        }
+                    });
+                } catch (Exception e) {
+                    check_vosk_downloaded_model(VOSK_MODEL.ISO_CODE);
+                    toast(e.getMessage());
+                    //textview_debug.setText(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void publishProgress(Integer... progress) {
+        mProgressBar.setProgress(progress[0]);
+    }
+
+    private void check_vosk_downloaded_model(String string_model) {
+        File edir = new File(VOSK_MODEL.EXTRACTED_PATH + "/" + string_model);
+        if (Objects.equals(VOSK_MODEL.ISO_CODE, "en-US")) {
+            button_delete_model.setVisibility(View.GONE);
+            button_download_model.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.GONE);
+            textview_modelURL.setVisibility(View.GONE);
+            textview_model_zip_file.setVisibility(View.GONE);
+            textview_filesize.setVisibility(View.GONE);
+            textview_bytesdownloaded.setVisibility(View.GONE);
+            textview_downloaded_status.setVisibility(View.GONE);
+        } else {
+            if (edir.exists()) {
+                VOSK_MODEL.DOWNLOADED = true;
+                VOSK_MODEL.USED_PATH = VOSK_MODEL.EXTRACTED_PATH + "/" + string_model;
+                String downloaded_status = "Model has been downloaded";
+                textview_downloaded_status.setText(downloaded_status);
+                button_delete_model.setVisibility(View.VISIBLE);
+                button_download_model.setVisibility(View.GONE);
+                textview_modelURL.setVisibility(View.GONE);
+                textview_model_zip_file.setVisibility(View.GONE);
+                textview_filesize.setVisibility(View.GONE);
+                textview_bytesdownloaded.setVisibility(View.GONE);
+                textview_downloaded_status.setVisibility(View.GONE);
+                textview_extracted_folder.setVisibility(View.VISIBLE);
+                textview_extracted_folder.setText(VOSK_MODEL.USED_PATH);
+            } else {
+                VOSK_MODEL.DOWNLOADED = false;
+                VOSK_MODEL.USED_PATH = "";
+                String downloaded_status = "Model is not downloaded yet";
+                textview_downloaded_status.setText(downloaded_status);
+                button_delete_model.setVisibility(View.GONE);
+                button_download_model.setVisibility(View.VISIBLE);
+                textview_modelURL.setVisibility(View.VISIBLE);
+                textview_model_zip_file.setVisibility(View.VISIBLE);
+                textview_extracted_folder.setVisibility(View.VISIBLE);
+                textview_extracted_folder.setText(VOSK_MODEL.USED_PATH);
             }
         }
     }
 
+    void deleteRecursively(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory())
+            for (File child : Objects.requireNonNull(fileOrDirectory.listFiles()))
+                deleteRecursively(child);
+        fileOrDirectory.delete();
+    }
+
+    private void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
 }
+

@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -50,9 +51,10 @@ public class create_overlay_mic_button extends Service{
     public void onDestroy() {
         super.onDestroy();
         if (mGlobalOverlay_mic_button != null) {
+            //OVERLAYING_STATUS.OVERLAYING = false;
             mGlobalOverlay_mic_button.removeOverlayView(mic_button);
         }
-        if (IS_OVER_REMOVEVIEW.IS_OVER) {
+        if (IS_OVER_REMOVEVIEW_STATUS.IS_OVER) {
             RECOGNIZING_STATUS.RECOGNIZING = false;
             OVERLAYING_STATUS.OVERLAYING = false;
             VOICE_TEXT.STRING = "";

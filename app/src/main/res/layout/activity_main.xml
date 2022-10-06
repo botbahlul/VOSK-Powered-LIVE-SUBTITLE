@@ -48,6 +48,88 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             />
+        <Button
+            android:id="@+id/button_delete_model"
+            android:layout_marginLeft="100dp"
+            android:layout_marginRight="100dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/delete_model"
+            android:visibility="invisible"
+            />
+        <Button
+            android:id="@+id/button_download_model"
+            android:layout_marginLeft="100dp"
+            android:layout_marginRight="100dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/download_model"
+            android:visibility="invisible"
+            />
+        <ProgressBar
+            android:id="@+id/mProgressBar"
+            android:max="100"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            />
+        <TextView
+            android:id="@+id/textview_modelURL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:textSize="12sp"
+            android:visibility="invisible"
+            />
+        <TextView
+            android:id="@+id/textview_model_zip_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:textSize="12sp"
+            android:visibility="invisible"
+            />
+        <TextView
+            android:id="@+id/textview_filesize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:textSize="12sp"
+            android:visibility="invisible"
+            />
+        <TextView
+            android:id="@+id/textview_bytesdownloaded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:textSize="12sp"
+            android:visibility="invisible"
+            />
+        <TextView
+            android:id="@+id/textview_downloaded_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:textSize="12sp"
+            />
+        <TextView
+            android:id="@+id/textview_extracted_folder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:textSize="12sp"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
+            />
         <TextView
             android:id="@+id/textview_text2"
             android:layout_width="wrap_content"
@@ -55,7 +137,8 @@
             android:gravity="center"
             android:text="@string/translation_language"
             android:textAlignment="gravity"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            />
         <Spinner
             android:id="@+id/spinner_dst_languages"
             android:layout_width="wrap_content"
@@ -66,7 +149,8 @@
             android:gravity="center"
             android:minHeight="48dp"
             android:spinnerMode="dropdown"
-            android:textAlignment="gravity" />
+            android:textAlignment="gravity"
+            />
         <TextView
             android:id="@+id/textview_dst"
             android:textAlignment="gravity"
@@ -92,7 +176,10 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             />
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
+            />
         <Button
             android:id="@+id/button_toggle_overlay"
             android:layout_marginLeft="100dp"
@@ -101,7 +188,10 @@
             android:layout_width="wrap_content"
             android:text="@string/toggle_overlay"
             />
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
+            />
         <EditText
             android:id="@+id/voice_text"
             android:layout_width="match_parent"
@@ -114,8 +204,12 @@
             android:textSize="18sp"
             android:textAlignment="gravity"
             android:textColorHint="#616161"
-            tools:ignore="LabelFor,TextFields" />
-
+            tools:ignore="LabelFor,TextFields"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
+            />
         <TextView
             android:id="@+id/textview_debug"
             android:layout_width="fill_parent"
@@ -123,8 +217,8 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:scrollbars="vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
         <TextView
             android:id="@+id/textview_debug2"
             android:layout_width="fill_parent"
@@ -132,7 +226,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:scrollbars="vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
     </TableLayout>
 </ScrollView>

@@ -39,10 +39,5 @@ public class BaseActivity extends AppCompatActivity implements ScreenOrientation
     }
 
     @Override
-    public void onScreenOrientationChanged(int orientation) {
-        /*if (VoiceRecognizer.mic_button != null) {
-
-        }*/
-
-    }
+    public void onScreenOrientationChanged(int orientation) {}
 }

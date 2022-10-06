@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.Objects;
 
@@ -73,7 +74,7 @@ public class create_overlay_translation_text extends Service {
             overlay_translation_text_container.setVisibility(View.INVISIBLE);
         }
         int h;
-        if (Objects.equals(LANGUAGE_PREFS.DST, "ja") || Objects.equals(LANGUAGE_PREFS.DST, "zh")) {
+        if (Objects.equals(LANGUAGE.DST, "ja") || Objects.equals(LANGUAGE.DST, "zh")) {
             h = 122;
         }
         else {
