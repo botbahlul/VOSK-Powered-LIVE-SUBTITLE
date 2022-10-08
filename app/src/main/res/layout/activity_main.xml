@@ -59,6 +59,7 @@
             android:autofillHints=""
             android:focusable="false"
             android:focusableInTouchMode="true"
+            android:hint="@string/recognized_words"
             android:gravity="center"
             android:maxLines="5"
             android:textAlignment="gravity"
