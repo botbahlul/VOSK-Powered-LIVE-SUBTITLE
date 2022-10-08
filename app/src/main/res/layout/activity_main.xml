@@ -46,7 +46,28 @@
             android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="14sp"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
+            />
+        <EditText
+            android:id="@+id/voice_text"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:autofillHints=""
+            android:focusable="false"
+            android:focusableInTouchMode="true"
+            android:gravity="center"
+            android:maxLines="5"
+            android:textAlignment="gravity"
+            android:textColorHint="#616161"
             android:textSize="18sp"
+            tools:ignore="LabelFor,TextFields" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
             />
         <TextView
             android:id="@+id/textview_text2"
@@ -73,7 +94,11 @@
             android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="14sp"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
             />
         <TextView
             android:id="@+id/textview_recognizing"
@@ -82,7 +107,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textSize="18sp"
+            android:textSize="14sp"
             />
         <TextView
             android:id="@+id/textview_overlaying"
@@ -90,9 +115,12 @@
             android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="14sp"
             />
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
+            />
         <Button
             android:id="@+id/button_toggle_overlay"
             android:layout_marginLeft="100dp"
@@ -101,21 +129,10 @@
             android:layout_width="wrap_content"
             android:text="@string/toggle_overlay"
             />
-
-        <EditText
-            android:id="@+id/voice_text"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="96dp"
-            android:autofillHints=""
-            android:gravity="center"
-            android:focusable="false"
-            android:focusableInTouchMode="true"
-            android:maxLines="3"
-            android:textSize="18sp"
-            android:textAlignment="gravity"
-            android:textColorHint="#616161"
-            tools:ignore="LabelFor,TextFields" />
-
+            android:layout_height="12sp"
+            />
         <TextView
             android:id="@+id/textview_debug"
             android:layout_width="fill_parent"
@@ -123,8 +140,9 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:scrollbars="vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="14sp"
+            />
         <TextView
             android:id="@+id/textview_debug2"
             android:layout_width="fill_parent"
@@ -132,7 +150,9 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:scrollbars="vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="14sp"
+            />
     </TableLayout>
 </ScrollView>
+
