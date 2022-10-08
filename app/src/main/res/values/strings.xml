@@ -19,5 +19,6 @@
     <string name="translation_language">Translation Language</string>
     <string name="spinner_dst_languages">spinner_dst_languages</string>
     <string name="toggle_overlay">Toggle Overlay</string>
+    <string name="recognized_words">Recognized words</string>
 
 </resources>
