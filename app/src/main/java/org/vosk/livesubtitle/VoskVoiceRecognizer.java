@@ -151,13 +151,21 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
                     .replace("\"", "");
         }
         VOICE_TEXT.STRING = results;
+        int h;
+        if (Objects.equals(LANGUAGE.SRC, "ja") || Objects.equals(LANGUAGE.SRC, "zh")) {
+            h = 122;
+        }
+        else {
+            h = 110;
+        }
+        MainActivity.voice_text.setHeight((int) (h * getResources().getDisplayMetrics().density));
         MainActivity.voice_text.setText(VOICE_TEXT.STRING);
         MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());
     }
 
     @Override
     public void onResult(String hypothesis) {
-        if (hypothesis != null) {
+        /*if (hypothesis != null) {
             results = (((((hypothesis.replace("text", ""))
                     .replace("{", ""))
                     .replace("}", ""))
@@ -167,12 +175,12 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
         }
         VOICE_TEXT.STRING = results;
         MainActivity.voice_text.setText(VOICE_TEXT.STRING);
-        MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());
+        MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());*/
     }
 
     @Override
     public void onFinalResult(String hypothesis) {
-        if (hypothesis != null) {
+        /*if (hypothesis != null) {
             results = (((((hypothesis.replace("text", ""))
                     .replace("{", ""))
                     .replace("}", ""))
@@ -182,7 +190,7 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
         }
         VOICE_TEXT.STRING = results;
         MainActivity.voice_text.setText(VOICE_TEXT.STRING);
-        MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());
+        MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());*/
         /*setUiState(STATE_DONE);
         if (speechStreamService != null) {
             speechStreamService = null;
