@@ -39,6 +39,7 @@
             android:value="langid,model2,model3" />
         <activity
             android:name=".MainActivity"
+            android:configChanges="keyboardHidden|screenSize|orientation|screenLayout|navigation"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
