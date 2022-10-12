@@ -99,48 +99,6 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
                 (exception) -> setErrorState("Failed to unpack the model" + exception.getMessage()));
     }
 
-    /*@Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (RECOGNIZING_STATUS.RECOGNIZING) {
-                speechService.startListening(this);
-            } else {
-                if (speechService != null) {
-                    speechService.stop();
-                    speechService.shutdown();
-                }
-                if (speechStreamService != null) {
-                    speechStreamService.stop();
-                }
-                if (translator != null) translator.close();
-                if (translator != null) {
-                    translator.close();
-                }
-                stopSelf();
-            }
-        }
-
-        else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            if (RECOGNIZING_STATUS.RECOGNIZING) {
-                speechService.startListening(this);
-            } else {
-                if (speechService != null) {
-                    speechService.stop();
-                    speechService.shutdown();
-                }
-                if (speechStreamService != null) {
-                    speechStreamService.stop();
-                }
-                if (translator != null) translator.close();
-                if (translator != null) {
-                    translator.close();
-                }
-                stopSelf();
-            }
-        }
-    }*/
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -324,7 +282,6 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
     }
 
     private void toast(String message) {
-        //Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
