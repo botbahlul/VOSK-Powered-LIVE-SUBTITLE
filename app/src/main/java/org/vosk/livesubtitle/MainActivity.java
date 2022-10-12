@@ -35,7 +35,6 @@ import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends BaseActivity {
 
-    /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static AudioManager audio;
     public static int mStreamVolume;
@@ -73,59 +72,6 @@ public class MainActivity extends BaseActivity {
     private File file_dst_en_folder;
     private String mlkit_status_message = "";
 
-    /*@Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            getWindowManager().getDefaultDisplay().getMetrics(display);
-            float d = display.density;
-            DISPLAY_METRIC.DISPLAY_WIDTH = display.widthPixels;
-            DISPLAY_METRIC.DISPLAY_HEIGHT = display.heightPixels;
-            DISPLAY_METRIC.DISPLAY_DENSITY = d;
-            String string_overlaying = "Overlaying=" + OVERLAYING_STATUS.OVERLAYING;
-            textview_overlaying.setText(string_overlaying);
-            if (OVERLAYING_STATUS.OVERLAYING) {
-                stop_create_overlay_mic_button();
-                start_create_overlay_mic_button();
-                stop_create_overlay_translation_text();
-                start_create_overlay_translation_text();
-                if (TRANSLATION_TEXT.STRING.length()>0) {
-                    create_overlay_translation_text.overlay_translation_text.setText(TRANSLATION_TEXT.STRING);
-                }
-            }
-            if (RECOGNIZING_STATUS.RECOGNIZING) {
-                stop_vosk_voice_recognizer();
-                start_vosk_voice_recognizer();
-            }
-            String string_recognizing = "Recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
-            textview_recognizing.setText(string_recognizing);
-        }
-        else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            getWindowManager().getDefaultDisplay().getMetrics(display);
-            float d = display.density;
-            DISPLAY_METRIC.DISPLAY_WIDTH = display.widthPixels;
-            DISPLAY_METRIC.DISPLAY_HEIGHT = display.heightPixels;
-            DISPLAY_METRIC.DISPLAY_DENSITY = d;
-            String string_overlaying = "Overlaying=" + OVERLAYING_STATUS.OVERLAYING;
-            textview_overlaying.setText(string_overlaying);
-            if (OVERLAYING_STATUS.OVERLAYING) {
-                stop_create_overlay_mic_button();
-                start_create_overlay_mic_button();
-                stop_create_overlay_translation_text();
-                start_create_overlay_translation_text();
-                if (TRANSLATION_TEXT.STRING.length()>0) {
-                    create_overlay_translation_text.overlay_translation_text.setText(TRANSLATION_TEXT.STRING);
-                }
-            }
-            if (RECOGNIZING_STATUS.RECOGNIZING) {
-                stop_vosk_voice_recognizer();
-                start_vosk_voice_recognizer();
-            }
-            String string_recognizing = "Recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
-            textview_recognizing.setText(string_recognizing);
-        }
-    }*/
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -155,7 +101,6 @@ public class MainActivity extends BaseActivity {
         arraylist_models.add("cs-CZ");
         arraylist_models.add("pl-PL");
 
-        // Setup layout
         arraylist_src.add("en");
         arraylist_src.add("zh");
         arraylist_src.add("ru");
@@ -615,16 +560,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    /*private void checkStoragePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
-    }*/
-
     private void start_create_overlay_mic_button() {
         Intent i = new Intent(this, create_overlay_mic_button.class);
         startService(i);
@@ -653,16 +588,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void check_mlkit_dictionary() {
-        //File edir = Environment.getExternalStorageDirectory();
-        //File idir = Environment.getDataDirectory();
-        //String string_edir = edir.toString();
-        //String string_idir = idir.toString();
-        //String PACKAGE_NAME = getApplicationContext().getPackageName().toString();
-        //String PACKAGE_FOLDER = "/data/data/" + PACKAGE_NAME;
-
-        //String string1 = "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.SRC + "_" + LANGUAGE.DST;
-        //String string2 = "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.DST + "_" + LANGUAGE.SRC;
-
         if (Objects.equals(textview_src.getText(), textview_dst.getText())) {
             MLKIT_DICTIONARY.READY = true;
             mlkit_status_message = "";
