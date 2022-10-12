@@ -34,27 +34,11 @@ public class create_overlay_mic_button extends Service{
         create_mic_button();
     }
 
-    /*@Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (RECOGNIZING_STATUS.RECOGNIZING) {
-                mic_button.setImageResource(R.drawable.ic_mic_black_on);
-            }
-        }
-        else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            mic_button.setForegroundGravity(Gravity.CENTER_HORIZONTAL);
-            if (RECOGNIZING_STATUS.RECOGNIZING) {
-                mic_button.setImageResource(R.drawable.ic_mic_black_on);
-            }
-        }
-    }*/
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (mGlobalOverlay_mic_button != null) {
-            //OVERLAYING_STATUS.OVERLAYING = false;
             mGlobalOverlay_mic_button.removeOverlayView(mic_button);
         }
         if (IS_OVER_REMOVEVIEW.IS_OVER) {
@@ -106,7 +90,6 @@ public class create_overlay_mic_button extends Service{
         mGlobalOverlay_mic_button.addOverlayView(mic_button,
                 96,
                 96,
-                //(int) ((0.5 * DISPLAY_METRIC.DISPLAY_WIDTH) - (0.5 * 96)),
                 0,
                 0,
                 new View.OnClickListener() {
@@ -181,7 +164,6 @@ public class create_overlay_mic_button extends Service{
     }
 
     private void toast(String message) {
-        //Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -189,14 +171,5 @@ public class create_overlay_mic_button extends Service{
             }
         });
     }
-
-    /*private void start_create_overlay_translation_text() {
-        Intent i = new Intent(this, create_overlay_translation_text.class);
-        startService(i);
-    }
-
-    private void stop_create_overlay_translation_text() {
-        stopService(new Intent(this, create_overlay_translation_text.class));
-    }*/
 
 }
