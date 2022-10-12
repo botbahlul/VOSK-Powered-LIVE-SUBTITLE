@@ -59,7 +59,6 @@ public class create_overlay_translation_text extends Service {
         overlay_translation_text.setTextColor(Color.YELLOW);
         overlay_translation_text.setVisibility(View.INVISIBLE);
         if (RECOGNIZING_STATUS.RECOGNIZING) {
-            //MainActivity.audio.setStreamVolume(AudioManager.STREAM_NOTIFICATION, 0, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
             if (TRANSLATION_TEXT.STRING.length() == 0) {
                 overlay_translation_text.setVisibility(View.INVISIBLE);
                 overlay_translation_text_container.setVisibility(View.INVISIBLE);
@@ -68,24 +67,17 @@ public class create_overlay_translation_text extends Service {
                 overlay_translation_text_container.setVisibility(View.VISIBLE);
             }
         } else {
-            //MainActivity.audio.setStreamVolume(AudioManager.STREAM_NOTIFICATION, MainActivity.mStreamVolume, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
             overlay_translation_text.setVisibility(View.INVISIBLE);
             overlay_translation_text_container.setVisibility(View.INVISIBLE);
         }
         int h;
         if (Objects.equals(LANGUAGE.DST, "ja") || Objects.equals(LANGUAGE.DST, "zh")) {
-            //h = 122;
             h = 75;
         }
         else {
-            //h = 108;
             h = 62;
         }
         mGlobalOverlay_overlay_translation_text.addOverlayView(overlay_translation_text_container,
-                //(int) (0.85* DISPLAY_METRIC.DISPLAY_WIDTH),
-                //(int) (h * getResources().getDisplayMetrics().density),
-                //(int) ((0.5* DISPLAY_METRIC.DISPLAY_WIDTH)-0.5*(0.85* DISPLAY_METRIC.DISPLAY_WIDTH)),
-                //(int) (0.3* DISPLAY_METRIC.DISPLAY_HEIGHT),
                 (int) (0.85* DISPLAY_METRIC.DISPLAY_WIDTH),
                 (int) (h * getResources().getDisplayMetrics().density),
                 0,
