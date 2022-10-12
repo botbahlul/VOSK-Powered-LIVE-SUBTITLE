@@ -74,15 +74,21 @@ public class create_overlay_translation_text extends Service {
         }
         int h;
         if (Objects.equals(LANGUAGE.DST, "ja") || Objects.equals(LANGUAGE.DST, "zh")) {
-            h = 122;
+            //h = 122;
+            h = 75;
         }
         else {
-            h = 108;
+            //h = 108;
+            h = 62;
         }
         mGlobalOverlay_overlay_translation_text.addOverlayView(overlay_translation_text_container,
+                //(int) (0.85* DISPLAY_METRIC.DISPLAY_WIDTH),
+                //(int) (h * getResources().getDisplayMetrics().density),
+                //(int) ((0.5* DISPLAY_METRIC.DISPLAY_WIDTH)-0.5*(0.85* DISPLAY_METRIC.DISPLAY_WIDTH)),
+                //(int) (0.3* DISPLAY_METRIC.DISPLAY_HEIGHT),
                 (int) (0.85* DISPLAY_METRIC.DISPLAY_WIDTH),
-                (int) (h *getResources().getDisplayMetrics().density),
-                (int) ((0.5* DISPLAY_METRIC.DISPLAY_WIDTH)-0.5*(0.85* DISPLAY_METRIC.DISPLAY_WIDTH)),
+                (int) (h * getResources().getDisplayMetrics().density),
+                0,
                 (int) (0.3* DISPLAY_METRIC.DISPLAY_HEIGHT),
                 new View.OnClickListener() {
                     @Override

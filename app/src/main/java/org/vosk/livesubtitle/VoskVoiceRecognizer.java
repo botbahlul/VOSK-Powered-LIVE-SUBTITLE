@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Toast;
@@ -26,6 +28,8 @@ import org.vosk.android.SpeechStreamService;
 import org.vosk.android.StorageService;
 
 import java.io.IOException;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,6 +60,16 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
     public void onCreate() {
         super.onCreate();
         LibVosk.setLogLevel(LogLevel.INFO);
+
+        int h;
+        if (Objects.equals(LANGUAGE.SRC, "ja") || Objects.equals(LANGUAGE.SRC, "zh-Hans") || Objects.equals(LANGUAGE.SRC, "zh-Hant")) {
+            h = 122;
+        }
+        else {
+            h = 109;
+        }
+        MainActivity.voice_text.setHeight((int) (h * getResources().getDisplayMetrics().density));
+
         initModel(LANGUAGE.MODEL);
         if (RECOGNIZING_STATUS.RECOGNIZING) {
             Timer timer = new Timer();
@@ -85,7 +99,7 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
                 (exception) -> setErrorState("Failed to unpack the model" + exception.getMessage()));
     }
 
-    @Override
+    /*@Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -125,7 +139,7 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
                 stopSelf();
             }
         }
-    }
+    }*/
 
     @Override
     public void onDestroy() {
@@ -150,17 +164,15 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
                     .replace("partial", ""))
                     .replace("\"", "");
         }
-        VOICE_TEXT.STRING = results;
-        int h;
-        if (Objects.equals(LANGUAGE.SRC, "ja") || Objects.equals(LANGUAGE.SRC, "zh")) {
-            h = 122;
+        if (RECOGNIZING_STATUS.RECOGNIZING) {
+            VOICE_TEXT.STRING = results.toLowerCase(Locale.forLanguageTag(LANGUAGE.SRC));
+            MainActivity.voice_text.setText(VOICE_TEXT.STRING);
+            MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());
         }
         else {
-            h = 110;
+            VOICE_TEXT.STRING = "";
+            MainActivity.voice_text.setText("");
         }
-        MainActivity.voice_text.setHeight((int) (h * getResources().getDisplayMetrics().density));
-        MainActivity.voice_text.setText(VOICE_TEXT.STRING);
-        MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());
     }
 
     @Override
@@ -173,9 +185,15 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
                     .replace("partial", ""))
                     .replace("\"", "");
         }
-        VOICE_TEXT.STRING = results;
-        MainActivity.voice_text.setText(VOICE_TEXT.STRING);
-        MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());*/
+        if (RECOGNIZING_STATUS.RECOGNIZING) {
+            VOICE_TEXT.STRING = results.toLowerCase(Locale.forLanguageTag(LANGUAGE.SRC));
+            MainActivity.voice_text.setText(VOICE_TEXT.STRING);
+            MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());
+        }
+        else {
+            VOICE_TEXT.STRING = "";
+            MainActivity.voice_text.setText("");
+        }*/
     }
 
     @Override
@@ -188,9 +206,15 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
                     .replace("partial", ""))
                     .replace("\"", "");
         }
-        VOICE_TEXT.STRING = results;
-        MainActivity.voice_text.setText(VOICE_TEXT.STRING);
-        MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());*/
+        if (RECOGNIZING_STATUS.RECOGNIZING) {
+            VOICE_TEXT.STRING = results.toLowerCase(Locale.forLanguageTag(LANGUAGE.SRC));
+            MainActivity.voice_text.setText(VOICE_TEXT.STRING);
+            MainActivity.voice_text.setSelection(MainActivity.voice_text.getText().length());
+        }
+        else {
+            VOICE_TEXT.STRING = "";
+            MainActivity.voice_text.setText("");
+        }*/
         /*setUiState(STATE_DONE);
         if (speechStreamService != null) {
             speechStreamService = null;
@@ -277,7 +301,7 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
         }
 
         if (MLKIT_DICTIONARY.READY) {
-            downloaded_status_message = "Dictionary is ready to use";
+            downloaded_status_message = "Dictionary is ready";
             MainActivity.textview_debug2.setText(downloaded_status_message);
             translator.translate(text).addOnSuccessListener(s -> {
                 TRANSLATION_TEXT.STRING = s;
@@ -300,7 +324,13 @@ public class VoskVoiceRecognizer extends Service implements RecognitionListener 
     }
 
     private void toast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

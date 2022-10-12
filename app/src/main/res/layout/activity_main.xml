@@ -55,13 +55,12 @@
         <EditText
             android:id="@+id/voice_text"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="124dp"
             android:autofillHints=""
             android:focusable="false"
             android:focusableInTouchMode="true"
-            android:hint="@string/recognized_words"
             android:gravity="center"
-            android:maxLines="5"
+            android:maxLines="3"
             android:textAlignment="gravity"
             android:textColorHint="#616161"
             android:textSize="18sp"
@@ -101,6 +100,22 @@
             android:layout_width="match_parent"
             android:layout_height="12sp"
             />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
+            />
+        <Button
+            android:id="@+id/button_toggle_overlay"
+            android:layout_marginLeft="100dp"
+            android:layout_marginRight="100dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/toggle_overlay"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12sp"
+            />
         <TextView
             android:id="@+id/textview_recognizing"
             android:textAlignment="gravity"
@@ -117,22 +132,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="12sp"
-            />
-        <Button
-            android:id="@+id/button_toggle_overlay"
-            android:layout_marginLeft="100dp"
-            android:layout_marginRight="100dp"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="@string/toggle_overlay"
-            />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="12sp"
             />
         <TextView
             android:id="@+id/textview_debug"
@@ -156,4 +155,3 @@
             />
     </TableLayout>
 </ScrollView>
-

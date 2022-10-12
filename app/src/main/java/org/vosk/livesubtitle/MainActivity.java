@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -34,6 +35,7 @@ import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends BaseActivity {
 
+    /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     public static AudioManager audio;
     public static int mStreamVolume;
@@ -71,11 +73,7 @@ public class MainActivity extends BaseActivity {
     private File file_dst_en_folder;
     private String mlkit_status_message = "";
 
-    //DON'T FORGET TO MODIFY AndroidManifest.xml
-    //         <activity
-    //            android:name=".MainActivity"
-    //            android:configChanges="keyboardHidden|screenSize|orientation|screenLayout|navigation"
-    @Override
+    /*@Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -126,7 +124,7 @@ public class MainActivity extends BaseActivity {
             String string_recognizing = "Recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
             textview_recognizing.setText(string_recognizing);
         }
-    }
+    }*/
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -347,6 +345,9 @@ public class MainActivity extends BaseActivity {
         textview_debug2 = findViewById(R.id.textview_debug2);
         voice_text = findViewById(R.id.voice_text);
 
+        setVolumeControlStream(AudioManager.MODE_IN_COMMUNICATION);
+        AudioManager am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        am.setSpeakerphoneOn(true);
         audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mStreamVolume = audio.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
 
@@ -385,27 +386,57 @@ public class MainActivity extends BaseActivity {
 
         spinner_src_languages.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                stop_vosk_voice_recognizer();
-                if (RECOGNIZING_STATUS.RECOGNIZING) start_vosk_voice_recognizer();
-                stop_create_overlay_translation_text();
-                if (OVERLAYING_STATUS.OVERLAYING) start_create_overlay_translation_text();
                 String src_country = spinner_src_languages.getSelectedItem().toString();
                 LANGUAGE.MODEL = map_model_country.get(src_country);
                 LANGUAGE.SRC = map_src_country.get(src_country);
                 textview_src.setText(LANGUAGE.SRC);
+
                 String dst_country = spinner_dst_languages.getSelectedItem().toString();
                 LANGUAGE.DST = map_dst_country.get(dst_country);
                 textview_dst.setText(LANGUAGE.DST);
 
-                string_en_src_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + textview_src.getText();
-                string_en_dst_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + textview_dst.getText();
-                string_src_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + textview_src.getText() + "_" + "en" ;
-                string_dst_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + textview_dst.getText() + "_" + "en" ;
+                string_en_src_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + LANGUAGE.SRC;
                 file_en_src_folder = new File(string_en_src_folder);
+                string_en_dst_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + LANGUAGE.DST;
                 file_en_dst_folder = new File(string_en_dst_folder);
+                string_src_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.SRC + "_" + "en" ;
                 file_src_en_folder = new File(string_src_en_folder);
+                string_dst_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.DST + "_" + "en" ;
                 file_dst_en_folder = new File(string_dst_en_folder);
                 check_mlkit_dictionary();
+
+                int h;
+                if (Objects.equals(LANGUAGE.DST, "ja") || Objects.equals(LANGUAGE.DST, "zh")) {
+                    h = 75;
+                }
+                else {
+                    h = 62;
+                }
+                voice_text.setHeight((int) (h * getResources().getDisplayMetrics().density));
+
+                stop_vosk_voice_recognizer();
+                stop_create_overlay_translation_text();
+                stop_create_overlay_mic_button();
+                if (OVERLAYING_STATUS.OVERLAYING) {
+                    if (!RECOGNIZING_STATUS.RECOGNIZING) {
+                        if (create_overlay_mic_button.mic_button != null) create_overlay_mic_button.mic_button.setImageResource(R.drawable.ic_mic_black_off);
+                    } else {
+                        start_vosk_voice_recognizer();
+                        if (create_overlay_mic_button.mic_button != null) create_overlay_mic_button.mic_button.setImageResource(R.drawable.ic_mic_black_on);
+                    }
+                    start_create_overlay_mic_button();
+                    if (create_overlay_mic_button.mic_button != null) create_overlay_mic_button.mic_button.setBackgroundColor(Color.parseColor("#80000000"));
+
+                    start_create_overlay_translation_text();
+                    if (TRANSLATION_TEXT.STRING.length() > 0) {
+                        if (create_overlay_translation_text.overlay_translation_text != null) create_overlay_translation_text.overlay_translation_text.setText(TRANSLATION_TEXT.STRING);
+                    }
+                }
+
+                String string_recognizing = "recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
+                textview_recognizing.setText(string_recognizing);
+                String string_overlaying =  "overlaying=" + OVERLAYING_STATUS.OVERLAYING;
+                textview_overlaying.setText(string_overlaying);
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -421,26 +452,56 @@ public class MainActivity extends BaseActivity {
 
         spinner_dst_languages.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                stop_vosk_voice_recognizer();
-                if (RECOGNIZING_STATUS.RECOGNIZING) start_vosk_voice_recognizer();
-                stop_create_overlay_translation_text();
-                if (OVERLAYING_STATUS.OVERLAYING) start_create_overlay_translation_text();
                 String src_country = spinner_src_languages.getSelectedItem().toString();
                 LANGUAGE.SRC = map_src_country.get(src_country);
                 textview_src.setText(LANGUAGE.SRC);
+
                 String dst_country = spinner_dst_languages.getSelectedItem().toString();
                 LANGUAGE.DST = map_dst_country.get(dst_country);
                 textview_dst.setText(LANGUAGE.DST);
 
-                string_en_src_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + textview_src.getText();
-                string_en_dst_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + textview_dst.getText();
-                string_src_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + textview_src.getText() + "_" + "en" ;
-                string_dst_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + textview_dst.getText() + "_" + "en" ;
+                string_en_src_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + LANGUAGE.SRC;
                 file_en_src_folder = new File(string_en_src_folder);
+                string_en_dst_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + "en" + "_" + LANGUAGE.DST;
                 file_en_dst_folder = new File(string_en_dst_folder);
+                string_src_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.SRC + "_" + "en" ;
                 file_src_en_folder = new File(string_src_en_folder);
+                string_dst_en_folder = Environment.getDataDirectory() + "/data/" + getApplicationContext().getPackageName() + "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.DST + "_" + "en" ;
                 file_dst_en_folder = new File(string_dst_en_folder);
                 check_mlkit_dictionary();
+
+                int h;
+                if (Objects.equals(LANGUAGE.DST, "ja") || Objects.equals(LANGUAGE.DST, "zh")) {
+                    h = 75;
+                }
+                else {
+                    h = 62;
+                }
+                voice_text.setHeight((int) (h * getResources().getDisplayMetrics().density));
+
+                stop_vosk_voice_recognizer();
+                stop_create_overlay_translation_text();
+                stop_create_overlay_mic_button();
+                if (OVERLAYING_STATUS.OVERLAYING) {
+                    if (!RECOGNIZING_STATUS.RECOGNIZING) {
+                        if (create_overlay_mic_button.mic_button != null) create_overlay_mic_button.mic_button.setImageResource(R.drawable.ic_mic_black_off);
+                    } else {
+                        start_vosk_voice_recognizer();
+                        if (create_overlay_mic_button.mic_button != null) create_overlay_mic_button.mic_button.setImageResource(R.drawable.ic_mic_black_on);
+                    }
+                    start_create_overlay_mic_button();
+                    if (create_overlay_mic_button.mic_button != null) create_overlay_mic_button.mic_button.setBackgroundColor(Color.parseColor("#80000000"));
+
+                    start_create_overlay_translation_text();
+                    if (TRANSLATION_TEXT.STRING.length() > 0) {
+                        if (create_overlay_translation_text.overlay_translation_text != null) create_overlay_translation_text.overlay_translation_text.setText(TRANSLATION_TEXT.STRING);
+                    }
+                }
+
+                String string_recognizing = "recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
+                textview_recognizing.setText(string_recognizing);
+                String string_overlaying =  "overlaying=" + OVERLAYING_STATUS.OVERLAYING;
+                textview_overlaying.setText(string_overlaying);
             }
 
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -466,16 +527,39 @@ public class MainActivity extends BaseActivity {
                         start_create_overlay_mic_button();
                         start_create_overlay_translation_text();
                     } else {
-                        VOICE_TEXT.STRING = "";
-                        TRANSLATION_TEXT.STRING = "";
-                        voice_text.setText("");
-                        create_overlay_translation_text.overlay_translation_text.setText("");
+                        stop_vosk_voice_recognizer();
                         stop_create_overlay_translation_text();
                         stop_create_overlay_mic_button();
-                        stop_vosk_voice_recognizer();
                         RECOGNIZING_STATUS.RECOGNIZING = false;
-                        String string_recognizing = "Recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
+                        String string_recognizing = "recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
                         textview_recognizing.setText(string_recognizing);
+                        string_overlaying = "overlaying=" + OVERLAYING_STATUS.OVERLAYING;
+                        textview_overlaying.setText(string_overlaying);
+                        MainActivity.textview_debug.setText("");
+                        VOICE_TEXT.STRING = "";
+                        TRANSLATION_TEXT.STRING = "";
+                        MainActivity.voice_text.setText("");
+                        String hints = "Recognized words";
+                        MainActivity.voice_text.setHint(hints);
+                        MainActivity.audio.setStreamVolume(AudioManager.STREAM_NOTIFICATION, (int)Double.parseDouble(String.valueOf((long)(MainActivity.audio.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION) / 2))), 0);
+                        if (create_overlay_translation_text.overlay_translation_text != null) {
+                            create_overlay_translation_text.overlay_translation_text.setText("");
+                            create_overlay_translation_text.overlay_translation_text.setVisibility(View.INVISIBLE);
+                            create_overlay_translation_text.overlay_translation_text_container.setVisibility(View.INVISIBLE);
+                        }
+                        if (create_overlay_mic_button.mic_button != null) {
+                            create_overlay_mic_button.mic_button.setVisibility(View.INVISIBLE);
+                        }
+                        MainActivity.textview_debug.setText("");
+                        VOICE_TEXT.STRING = "";
+                        TRANSLATION_TEXT.STRING = "";
+                        MainActivity.voice_text.setText("");
+                        string_recognizing = "recognizing=" + RECOGNIZING_STATUS.RECOGNIZING;
+                        textview_recognizing.setText(string_recognizing);
+                        string_overlaying = "overlaying=" + OVERLAYING_STATUS.OVERLAYING;
+                        textview_overlaying.setText(string_overlaying);
+                        hints = "Recognized words";
+                        MainActivity.voice_text.setHint(hints);
                     }
                 }
                 return false;
@@ -531,6 +615,16 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    /*private void checkStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+    }*/
+
     private void start_create_overlay_mic_button() {
         Intent i = new Intent(this, create_overlay_mic_button.class);
         startService(i);
@@ -559,6 +653,16 @@ public class MainActivity extends BaseActivity {
     }
 
     private void check_mlkit_dictionary() {
+        //File edir = Environment.getExternalStorageDirectory();
+        //File idir = Environment.getDataDirectory();
+        //String string_edir = edir.toString();
+        //String string_idir = idir.toString();
+        //String PACKAGE_NAME = getApplicationContext().getPackageName().toString();
+        //String PACKAGE_FOLDER = "/data/data/" + PACKAGE_NAME;
+
+        //String string1 = "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.SRC + "_" + LANGUAGE.DST;
+        //String string2 = "/no_backup/com.google.mlkit.translate.models/" + LANGUAGE.DST + "_" + LANGUAGE.SRC;
+
         if (Objects.equals(textview_src.getText(), textview_dst.getText())) {
             MLKIT_DICTIONARY.READY = true;
             mlkit_status_message = "";
