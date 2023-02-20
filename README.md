@@ -1,9 +1,12 @@
 # VOSK-Powered-LIVE-SUBTITLE
+
 ANDROID APP that can RECOGNIZE ANY LIVE AUDIO/VIDEO STREAMING (powered by VOSK Speech Recognition API) then TRANSLATE (powered by ANDROID MLKIT TRANSLATE) and display them as SUBTITLES
 
 
 https://user-images.githubusercontent.com/88623122/193421588-a7a6cf3d-c241-44fe-b29b-2bac910dd1e2.mp4
 
+UPDATE NOTES : I SUGGEST NOT TO USE THIS VARIANT ANYMORE, PLEASE USE VARIANT 3 AT :
+https://github.com/botbahlul/VOSK-Powered-Live-Subtitle-V3
 
 This app has PROS & CONS compared to other Speech Recognition APIs like those free Android Developer Speech Recognition, IBM WATSON, and PREMIUM GOOGPLE SPEECH API
 
