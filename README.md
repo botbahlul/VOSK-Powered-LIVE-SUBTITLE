@@ -223,3 +223,5 @@ preBuild.dependsOn(genUUID)
 If you need a MANAGABLE STORAGE SPACE USED BY VOSK MODELS (you can dinamically DOWNLOAD and DELETE models in your phone storage), you can try this git https://github.com/botbahlul/VOSK-Powered-LIVE-SUBTITLE-V2
 
 Check my other SPEECH RECOGNITIION + TRANSLATE PROJECTS https://github.com/botbahlul?tab=repositories
+
+Buy me coffee : https://sociabuzz.com/botbahlul/tribe
